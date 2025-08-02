@@ -224,6 +224,17 @@ class StorageManager {
     const currentSettings = await this.getSettings();
     const newSettings = { ...currentSettings, ...updates };
     await this.setSettings(newSettings);
+
+    // Clear cache to ensure fresh data
+    this.clearCache();
+
+    // Dispatch event to notify other components
+    document.dispatchEvent(
+      new CustomEvent('storageUpdated', {
+        detail: { key: 'settings', data: newSettings },
+      }),
+    );
+
     return newSettings;
   }
 

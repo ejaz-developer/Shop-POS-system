@@ -15,24 +15,53 @@ class POSManager {
     await this.loadSettings();
     await this.loadCustomers();
     this.setupEventListeners();
-    this.updateCartDisplay();
-    this.populateCustomerSelect();
+    this.setupGlobalEventListeners();
+  }
 
-    // Listen for customer updates from other modules
-    window.addEventListener('customerAdded', () => {
-      this.refreshCustomers();
+  setupGlobalEventListeners() {
+    // Listen for settings updates from other modules
+    document.addEventListener('settingsUpdated', () => {
+      console.log('Settings updated event received, reloading settings...');
+      this.loadSettings();
     });
 
-    window.addEventListener('customerUpdated', () => {
-      this.refreshCustomers();
+    // Listen for storage updates
+    document.addEventListener('storageUpdated', (event) => {
+      if (event.detail && event.detail.key === 'settings') {
+        console.log('Settings storage updated, reloading...');
+        this.loadSettings();
+      }
     });
   }
 
   async loadSettings() {
     try {
+      console.log('POS: Loading settings...');
+
+      // Clear cache to ensure fresh settings
+      Storage.clearCache();
+
       this.settings = await Storage.getSettings();
+      console.log('POS: Settings loaded successfully:', {
+        taxRate: this.settings.taxRate,
+        shopName: this.settings.shopName,
+        fullSettings: this.settings,
+      });
+
+      // Update cart display with new tax settings
+      this.updateCartDisplay();
     } catch (error) {
       console.error('Error loading settings:', error);
+      // Set default settings if loading fails
+      this.settings = {
+        taxRate: 0,
+        shopName: 'My Shop',
+        shopAddress: '',
+        shopPhone: '',
+        enableQRPayment: true,
+        qrPaymentInstructions: 'Scan QR code to pay',
+      };
+      console.log('POS: Using default settings:', this.settings);
     }
   }
 
@@ -121,6 +150,19 @@ class POSManager {
       window.ipcRenderer.on('menu-new-sale', () => this.clearCart());
       window.ipcRenderer.on('menu-print-receipt', () => this.showLastReceipt());
     }
+
+    // Initialize cart display and customer select
+    this.updateCartDisplay();
+    this.populateCustomerSelect();
+
+    // Listen for customer updates from other modules
+    window.addEventListener('customerAdded', () => {
+      this.refreshCustomers();
+    });
+
+    window.addEventListener('customerUpdated', () => {
+      this.refreshCustomers();
+    });
   }
 
   addProductToCart(product) {
@@ -290,7 +332,16 @@ class POSManager {
     }
 
     // Calculate and display totals
-    const totals = Utils.calculateCartTotals(this.cart, this.settings?.taxRate || 0);
+    const taxRate = this.settings?.taxRate || 0;
+    console.log('POS updateCartDisplay - Tax calculation:', {
+      settingsLoaded: !!this.settings,
+      taxRateFromSettings: this.settings?.taxRate,
+      taxRateUsed: taxRate,
+      settingsObject: this.settings,
+    });
+
+    const totals = Utils.calculateCartTotals(this.cart, taxRate);
+    console.log('Cart totals calculated:', totals);
 
     if (subtotalEl) subtotalEl.textContent = Utils.formatCurrency(totals.subtotal);
     if (taxEl) taxEl.textContent = Utils.formatCurrency(totals.tax);
@@ -299,11 +350,10 @@ class POSManager {
     // Update tax label
     const taxLabel = document.getElementById('taxLabel');
     if (taxLabel) {
-      const taxRate = this.settings?.taxRate || 0;
       if (taxRate > 0) {
         taxLabel.textContent = `Tax (${(taxRate * 100).toFixed(1)}%):`;
       } else {
-        taxLabel.textContent = 'Tax:';
+        taxLabel.textContent = 'Tax (0%):';
       }
     } // Update change amount if cash payment
     this.updateChangeAmount();

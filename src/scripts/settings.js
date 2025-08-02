@@ -91,8 +91,12 @@ class SettingsManager {
     if (shopAddressField) shopAddressField.value = this.settings.shopAddress || '';
     if (shopPhoneField) shopPhoneField.value = this.settings.shopPhone || '';
     if (taxRateField) {
-      const taxPercentage = (this.settings.taxRate || 0.1) * 100;
+      const taxPercentage = (this.settings.taxRate || 0) * 100; // Default to 0% instead of 10%
       taxRateField.value = taxPercentage;
+      console.log('Settings form populated - Tax rate:', {
+        taxRateFromSettings: this.settings.taxRate,
+        taxPercentageDisplayed: taxPercentage,
+      });
     }
 
     // Payment settings
@@ -132,7 +136,7 @@ class SettingsManager {
         shopName: shopNameField?.value.trim() || 'My Shop',
         shopAddress: shopAddressField?.value.trim() || '',
         shopPhone: shopPhoneField?.value.trim() || '',
-        taxRate: (parseFloat(taxRateField?.value) || 10) / 100, // Convert from percentage
+        taxRate: (parseFloat(taxRateField?.value) || 0) / 100, // Convert from percentage, default to 0
         enableQRPayment: enableQRField?.checked === true,
         qrPaymentInstructions:
           qrInstructionsField?.value.trim() || 'Scan QR code to pay with your mobile wallet',

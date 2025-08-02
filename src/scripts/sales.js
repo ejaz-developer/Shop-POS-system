@@ -12,8 +12,25 @@ class SalesManager {
   async init() {
     await this.loadSales();
     this.setupEventListeners();
+    this.populateDateInputs(); // Ensure date inputs are populated first
     this.renderSalesData();
     this.initializeChart();
+  }
+
+  populateDateInputs() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    if (startDateInput && endDateInput) {
+      startDateInput.value = this.currentDateRange.startDate.toISOString().split('T')[0];
+      endDateInput.value = this.currentDateRange.endDate.toISOString().split('T')[0];
+      console.log('Date inputs populated:', {
+        startDate: startDateInput.value,
+        endDate: endDateInput.value,
+      });
+    } else {
+      console.warn('Date input elements not found');
+    }
   }
 
   async loadSales() {
@@ -62,12 +79,6 @@ class SalesManager {
       });
     }
 
-    // Set default date range (last 30 days)
-    if (startDateInput && endDateInput) {
-      startDateInput.value = this.currentDateRange.startDate.toISOString().split('T')[0];
-      endDateInput.value = this.currentDateRange.endDate.toISOString().split('T')[0];
-    }
-
     // Listen for new sales being added
     document.addEventListener('saleAdded', (event) => {
       console.log('New sale added, refreshing sales data');
@@ -78,7 +89,7 @@ class SalesManager {
   getDefaultDateRange() {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1); // Show last year of data
+    startDate.setDate(startDate.getDate() - 30); // Show last 30 days of data
 
     console.log('Default date range:', { startDate, endDate });
     return { startDate, endDate };
@@ -597,10 +608,16 @@ class SalesManager {
   // Public methods for external access
   async refreshSales() {
     console.log('Refreshing sales data...');
+
+    // Clear cache to ensure fresh data
+    Storage.clearCache();
+
     await this.loadSales();
     this.renderSalesData();
     this.updateChart();
+
     console.log('Sales data refreshed');
+    Utils.showNotification('Sales data refreshed successfully', 'success');
   }
 
   getSales() {
@@ -618,8 +635,12 @@ class SalesManager {
     console.log('Sales filtering:', {
       totalSales: this.sales.length,
       filteredSales: filtered.length,
-      dateRange: this.currentDateRange,
-      salesDates: this.sales.map((s) => s.date),
+      dateRange: {
+        start: this.currentDateRange.startDate.toISOString().split('T')[0],
+        end: this.currentDateRange.endDate.toISOString().split('T')[0],
+      },
+      firstSaleDate: this.sales.length > 0 ? this.sales[0].date : 'No sales',
+      lastSaleDate: this.sales.length > 0 ? this.sales[this.sales.length - 1].date : 'No sales',
     });
 
     return filtered;
