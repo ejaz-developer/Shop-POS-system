@@ -1,6 +1,6 @@
 {
   "name": "shop-pos-system",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive shop POS system with inventory management, billing, and QR payment",
   "main": "main.js",
   "scripts": {
