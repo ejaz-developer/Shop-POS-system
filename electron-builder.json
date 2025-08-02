@@ -1,0 +1,20 @@
+{
+  "appId": "com.shop.pos-system",
+  "productName": "Shop POS System",
+  "directories": {
+    "output": "dist"
+  },
+  "files": ["**/*", "!node_modules/**/*", "node_modules/electron-store/**/*"],
+  "extraMetadata": {
+    "main": "main.js"
+  },
+  "win": {
+    "target": "dir"
+  },
+  "mac": {
+    "target": "dir"
+  },
+  "linux": {
+    "target": "dir"
+  }
+}

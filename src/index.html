@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop POS System</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <h1><i class="fas fa-store"></i> Shop POS System</h1>
+        </div>
+        <div class="header-right">
+          <span class="current-time" id="currentTime"></span>
+          <span class="current-date" id="currentDate"></span>
+        </div>
+      </header>
+
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar">
+        <ul class="nav-menu">
+          <li class="nav-item active" data-page="pos">
+            <i class="fas fa-cash-register"></i>
+            <span>Point of Sale</span>
+          </li>
+          <li class="nav-item" data-page="inventory">
+            <i class="fas fa-boxes"></i>
+            <span>Inventory</span>
+          </li>
+          <li class="nav-item" data-page="products">
+            <i class="fas fa-tags"></i>
+            <span>Products</span>
+          </li>
+          <li class="nav-item" data-page="sales">
+            <i class="fas fa-chart-line"></i>
+            <span>Sales Reports</span>
+          </li>
+          <li class="nav-item" data-page="customers">
+            <i class="fas fa-users"></i>
+            <span>Customers</span>
+          </li>
+          <li class="nav-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Point of Sale Page -->
+        <div class="page active" id="pos-page">
+          <div class="pos-container">
+            <!-- Product Search and List -->
+            <div class="pos-left">
+              <div class="search-section">
+                <div class="search-bar">
+                  <input
+                    type="text"
+                    id="productSearch"
+                    placeholder="Search products by name or barcode..."
+                  />
+                  <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="quick-categories">
+                  <button class="category-btn active" data-category="all">All</button>
+                  <button class="category-btn" data-category="electronics">Electronics</button>
+                  <button class="category-btn" data-category="clothing">Clothing</button>
+                  <button class="category-btn" data-category="food">Food</button>
+                  <button class="category-btn" data-category="books">Books</button>
+                </div>
+              </div>
+              <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+              </div>
+            </div>
+
+            <!-- Cart and Checkout -->
+            <div class="pos-right">
+              <div class="cart-section">
+                <div class="cart-header">
+                  <h3><i class="fas fa-shopping-cart"></i> Current Sale</h3>
+                  <button id="clearCart" class="btn-clear">Clear</button>
+                </div>
+                <div class="cart-items" id="cartItems">
+                  <!-- Cart items will appear here -->
+                </div>
+                <div class="cart-summary">
+                  <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                  </div>
+                  <div class="summary-row">
+                    <span id="taxLabel">Tax:</span>
+                    <span id="tax">$0.00</span>
+                  </div>
+                  <div class="summary-row total">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                  </div>
+                </div>
+                <div class="customer-section">
+                  <div class="customer-selection">
+                    <label>Customer (Optional):</label>
+                    <div class="customer-input-group">
+                      <select id="customerSelect">
+                        <option value="">Select Customer</option>
+                      </select>
+                      <button id="addNewCustomerFromPOS" class="btn-secondary btn-small">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <div
+                      id="selectedCustomerInfo"
+                      class="selected-customer-info"
+                      style="display: none"
+                    >
+                      <div class="customer-details">
+                        <span class="customer-name"></span>
+                        <span class="customer-stats"></span>
+                      </div>
+                      <button id="removeCustomer" class="btn-link">
+                        <i class="fas fa-times"></i> Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="payment-section">
+                  <div class="payment-methods">
+                    <button class="payment-btn active" data-method="cash">
+                      <i class="fas fa-money-bill"></i> Cash
+                    </button>
+                    <button class="payment-btn" data-method="qr">
+                      <i class="fas fa-qrcode"></i> QR Pay
+                    </button>
+                  </div>
+                  <div class="cash-input" id="cashInput">
+                    <label>Cash Received:</label>
+                    <input type="number" id="cashAmount" placeholder="0.00" step="0.01" />
+                  </div>
+                  <button id="processPayment" class="btn-primary btn-large">
+                    <i class="fas fa-credit-card"></i> Process Payment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Page -->
+        <div class="page" id="inventory-page">
+          <div class="page-header">
+            <h2><i class="fas fa-boxes"></i> Inventory Management</h2>
+            <button id="addProductBtn" class="btn-primary">
+              <i class="fas fa-plus"></i> Add Product
+            </button>
+          </div>
+          <div class="inventory-table-container">
+            <table class="inventory-table" id="inventoryTable">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <!-- Inventory items will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Products Page -->
+        <div class="page" id="products-page">
+          <div class="page-header">
+            <h2><i class="fas fa-tags"></i> Product Management</h2>
+            <button id="addNewProductBtn" class="btn-primary">
+              <i class="fas fa-plus"></i> Add New Product
+            </button>
+          </div>
+          <div class="products-container">
+            <div class="products-list" id="productsList">
+              <!-- Products will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Reports Page -->
+        <div class="page" id="sales-page">
+          <div class="page-header">
+            <h2><i class="fas fa-chart-line"></i> Sales Reports</h2>
+            <div class="date-filter">
+              <input type="date" id="startDate" />
+              <input type="date" id="endDate" />
+              <button id="filterSales" class="btn-secondary">Filter</button>
+              <button id="refreshSales" class="btn-primary">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+              <button id="exportSales" class="btn-secondary">
+                <i class="fas fa-download"></i> Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="sales-dashboard">
+            <div class="sales-stats">
+              <div class="stat-card">
+                <h3>Today's Sales</h3>
+                <p class="stat-value" id="todaySales">$0.00</p>
+              </div>
+              <div class="stat-card">
+                <h3>Total Transactions</h3>
+                <p class="stat-value" id="totalTransactions">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Average Sale</h3>
+                <p class="stat-value" id="averageSale">$0.00</p>
+              </div>
+            </div>
+            <div class="sales-chart">
+              <canvas id="salesChart"></canvas>
+            </div>
+            <div class="sales-table-container">
+              <table class="sales-table" id="salesTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Receipt #</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment Method</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                  <!-- Sales data will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customers Page -->
+        <div class="page" id="customers-page">
+          <div class="page-header">
+            <h2><i class="fas fa-users"></i> Customer Management</h2>
+            <button id="addCustomerBtn" class="btn-primary">
+              <i class="fas fa-plus"></i> Add Customer
+            </button>
+          </div>
+          <div class="customers-container">
+            <div class="customers-list" id="customersList">
+              <!-- Customers will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="settings-page">
+          <div class="page-header">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+          </div>
+          <div class="settings-container">
+            <div class="settings-section">
+              <h3>Shop Information</h3>
+              <div class="form-group">
+                <label>Shop Name:</label>
+                <input type="text" id="shopName" value="My Shop" />
+              </div>
+              <div class="form-group">
+                <label>Address:</label>
+                <textarea id="shopAddress" rows="3">123 Main Street, City, State</textarea>
+              </div>
+              <div class="form-group">
+                <label>Phone:</label>
+                <input type="text" id="shopPhone" value="+1 234 567 8900" />
+              </div>
+              <div class="form-group">
+                <label>Tax Rate (%):</label>
+                <input type="number" id="taxRate" value="10" step="0.1" />
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Payment Settings</h3>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="enableQRPayment" checked />
+                  Enable QR Code Payments
+                </label>
+              </div>
+              <div class="form-group">
+                <label>QR Payment Instructions:</label>
+                <textarea id="qrPaymentInstructions" rows="2">
+Scan QR code to pay with your mobile wallet</textarea
+                >
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Data Management</h3>
+              <div class="data-management-section">
+                <div class="form-group">
+                  <label>Clear Application Data:</label>
+                  <p class="help-text">Warning: This will permanently delete all your data!</p>
+                </div>
+                <div class="data-actions">
+                  <button id="clearProducts" class="btn-warning">
+                    <i class="fas fa-trash"></i> Clear All Products
+                  </button>
+                  <button id="clearSales" class="btn-warning">
+                    <i class="fas fa-trash"></i> Clear All Sales Reports
+                  </button>
+                  <button id="clearCustomers" class="btn-warning">
+                    <i class="fas fa-trash"></i> Clear All Customers
+                  </button>
+                  <button id="clearAllData" class="btn-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Clear ALL Data
+                  </button>
+                </div>
+                <div class="form-group">
+                  <label>Application Storage Location:</label>
+                  <p class="help-text" id="dataLocation">Loading storage location...</p>
+                  <button id="openDataFolder" class="btn-secondary">
+                    <i class="fas fa-folder-open"></i> Open Data Folder
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button id="saveSettings" class="btn-primary">Save Settings</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal for Add Product -->
+    <div class="modal" id="productModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="productModalTitle">Add New Product</h3>
+          <button class="modal-close" id="closeProductModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="productForm">
+            <div class="form-group">
+              <label>Product Name:</label>
+              <input type="text" id="productName" required />
+            </div>
+            <div class="form-group">
+              <label>Category:</label>
+              <select id="productCategory" required>
+                <option value="">Select Category</option>
+                <option value="electronics">Electronics</option>
+                <option value="clothing">Clothing</option>
+                <option value="food">Food</option>
+                <option value="books">Books</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price:</label>
+              <input type="number" id="productPrice" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Stock Quantity:</label>
+              <input type="number" id="productStock" required />
+            </div>
+            <div class="form-group">
+              <label>Barcode (optional):</label>
+              <input type="text" id="productBarcode" />
+            </div>
+            <div class="form-group">
+              <label>Description:</label>
+              <textarea id="productDescription" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="cancelProduct" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Save Product</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Receipt Display -->
+    <div class="modal" id="receiptModal">
+      <div class="modal-content receipt-modal">
+        <div class="modal-header">
+          <h3>Receipt</h3>
+          <button class="modal-close" id="closeReceiptModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="receipt" id="receiptContent">
+            <!-- Receipt content will be generated here -->
+          </div>
+          <div class="receipt-actions">
+            <button id="printReceipt" class="btn-primary">
+              <i class="fas fa-print"></i> Print
+            </button>
+            <button id="generateQR" class="btn-secondary">
+              <i class="fas fa-qrcode"></i> Generate QR
+            </button>
+          </div>
+          <div class="qr-code-container" id="qrCodeContainer" style="display: none">
+            <h4>QR Code for Payment</h4>
+            <div id="qrCodeDisplay"></div>
+            <p class="qr-instructions" id="qrInstructions"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Add/Edit Customer -->
+    <div class="modal" id="customerModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="customerModalTitle">Add Customer</h3>
+          <button class="modal-close" id="closeCustomerModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="customerForm">
+            <div class="form-group">
+              <label for="customerName">Name *</label>
+              <input type="text" id="customerName" required />
+            </div>
+            <div class="form-group">
+              <label for="customerEmail">Email</label>
+              <input type="email" id="customerEmail" />
+            </div>
+            <div class="form-group">
+              <label for="customerPhone">Phone</label>
+              <input type="tel" id="customerPhone" />
+            </div>
+            <div class="form-group">
+              <label for="customerAddress">Address</label>
+              <textarea id="customerAddress" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="cancelCustomer">Cancel</button>
+              <button type="submit" class="btn-primary" id="saveCustomer">Save Customer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/products.js"></script>
+    <script src="scripts/pos.js"></script>
+    <script src="scripts/inventory.js"></script>
+    <script src="scripts/sales.js"></script>
+    <script src="scripts/customers.js"></script>
+    <script src="scripts/settings.js"></script>
+    <script src="scripts/app.js"></script>
+  </body>
+</html>

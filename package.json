@@ -1,0 +1,88 @@
+{
+  "name": "shop-pos-system",
+  "version": "1.0.0",
+  "description": "A comprehensive shop POS system with inventory management, billing, and QR payment",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "dev": "electron . --dev",
+    "build": "electron-builder --config electron-builder.json",
+    "build-simple": "electron-builder --dir --config.directories.output=dist --config.win.target=dir",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir --config electron-builder.json",
+    "postinstall": "electron-builder install-app-deps",
+    "build-win": "electron-builder --windows nsis:ia32",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "keywords": [
+    "electron",
+    "pos-system",
+    "shop-management",
+    "inventory",
+    "billing",
+    "desktop-app"
+  ],
+  "author": "Shop Manager",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.2",
+    "@electron-forge/maker-deb": "^7.8.2",
+    "@electron-forge/maker-rpm": "^7.8.2",
+    "@electron-forge/maker-squirrel": "^7.8.2",
+    "@electron-forge/maker-zip": "^7.8.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.2",
+    "@electron-forge/plugin-fuses": "^7.8.2",
+    "@electron-forge/publisher-github": "^7.8.2",
+    "@electron/fuses": "^2.0.0",
+    "electron": "^27.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-store": "^8.1.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "moment": "^2.29.4",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.1"
+  },
+  "build": {
+    "appId": "com.shop.pos-system",
+    "productName": "Shop POS System",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "node_modules/electron-store/**/*",
+      "node_modules/qrcode/**/*",
+      "node_modules/jspdf/**/*",
+      "node_modules/html2canvas/**/*",
+      "node_modules/uuid/**/*",
+      "node_modules/moment/**/*",
+      "node_modules/chart.js/**/*"
+    ],
+    "compression": "normal",
+    "removePackageScripts": true,
+    "win": {
+      "target": {
+        "target": "dir",
+        "arch": [
+          "x64"
+        ]
+      },
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dir",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "dir",
+      "icon": "assets/icon.png"
+    }
+  }
+}
